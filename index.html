@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMART-ER 2.0 - AI Emergency Routing System | Tamil Nadu</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Tamil:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Libraries -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="pulse-ring"></div>
+            <div class="logo-container">
+                <i class="fas fa-heartbeat"></i>
+                <span>SMART-ER 2.0</span>
+            </div>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+            <p class="loading-text">Initializing AI Emergency System...</p>
+        </div>
+    </div>
+
+    <!-- Floating Emergency Status -->
+    <div class="floating-status" id="floatingStatus">
+        <div class="status-indicator green"></div>
+        <span id="statusText">System Normal</span>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="main-nav" id="mainNav">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-hospital-alt"></i>
+                <span class="logo-text">SMART-ER <span class="version">2.0</span></span>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="#hero" data-en="Home" data-ta="முகப்பு">Home</a></li>
+                <li><a href="#problem" data-en="About" data-ta="பற்றி">About</a></li>
+                <li><a href="#live-flow" data-en="Live Flow" data-ta="நேரடி ஓட்டம்">Live Flow</a></li>
+                <li><a href="#ai-dashboard" data-en="AI Dashboard" data-ta="AI முகப்பு">AI Dashboard</a></li>
+                <li><a href="#hospital-map" data-en="Hospital Map" data-ta="மருத்துவமனை வரைபடம்">Hospital Map</a></li>
+                <li><a href="#bed-dashboard" data-en="Bed Status" data-ta="படுக்கை நிலை">Bed Status</a></li>
+                <li><a href="#prediction" data-en="Prediction" data-ta="கணிப்பு">Prediction</a></li>
+            </ul>
+
+            <div class="nav-controls">
+                <button class="disaster-toggle" id="disasterToggle" onclick="toggleDisasterMode()">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span data-en="Disaster Mode" data-ta="அழிவு முறை">Disaster Mode</span>
+                </button>
+                
+                <button class="theme-toggle" id="themeToggle" onclick="toggleDarkMode()">
+                    <i class="fas fa-moon"></i>
+                </button>
+                
+                <button class="voice-btn" onclick="toggleVoiceInput()">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                
+                <div class="language-toggle">
+                    <button class="lang-btn active" onclick="setLanguage('en')">English</button>
+                    <button class="lang-btn" onclick="setLanguage('ta')">தமிழ்</button>
+                </div>
+            </div>
+
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <ul class="mobile-nav-links">
+            <li><a href="#hero" onclick="toggleMobileMenu()">Home</a></li>
+            <li><a href="#problem" onclick="toggleMobileMenu()">About</a></li>
+            <li><a href="#live-flow" onclick="toggleMobileMenu()">Live Flow</a></li>
+            <li><a href="#ai-dashboard" onclick="toggleMobileMenu()">AI Dashboard</a></li>
+            <li><a href="#hospital-map" onclick="toggleMobileMenu()">Hospital Map</a></li>
+            <li><a href="#bed-dashboard" onclick="toggleMobileMenu()">Bed Status</a></li>
+            <li><a href="#prediction" onclick="toggleMobileMenu()">Prediction</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section id="hero" class="hero-section">
+            <div class="hero-bg">
+                <div class="gradient-overlay"></div>
+                <div class="grid-pattern"></div>
+            </div>
+            
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <i class="fas fa-shield-alt"></i>
+                    <span data-en="Government of Tamil Nadu" data-ta="தமிழ்நாடு அரசு">Government of Tamil Nadu</span>
+                </div>
+                
+                <h1 class="hero-title">
+                    <span class="gradient-text" data-en="SMART-ER 2.0" data-ta="SMART-ER 2.0">SMART-ER 2.0</span>
+                </h1>
+                
+                <h2 class="hero-subtitle" data-en="AI-Powered Emergency Routing & Smart ICU Allocation" data-ta="AI-ஆற்றல் அவசர வழிநடத்தல் & ஸ்மார்ட் ICU ஒதுக்கீடு">
+                    AI-Powered Emergency Routing & Smart ICU Allocation
+                </h2>
+                
+                <p class="hero-description" data-en="Revolutionizing emergency healthcare with real-time AI decision making, predictive analytics, and seamless hospital network integration across Tamil Nadu." data-ta="நேரடி AI முடிவெடுப்பு, கணிப்பு பகுப்பாய்வு, மற்றும் தமிழ்நாடு முழுவதும் மருத்துவமனை பிணைய ஒருங்கிணைப்புடன் அவசர சுகாதாரத்தை புரட்சிகரமாக்குகிறது.">
+                    Revolutionizing emergency healthcare with real-time AI decision making, predictive analytics, and seamless hospital network integration across Tamil Nadu.
+                </p>
+                
+                <div class="hero-stats">
+                    <div class="stat-card glass">
+                        <div class="stat-icon"><i class="fas fa-hospital"></i></div>
+                        <div class="stat-number" id="statHospitals">0</div>
+                        <div class="stat-label" data-en="Hospitals Connected" data-ta="இணைக்கப்பட்ட மருத்துவமனைகள்">Hospitals Connected</div>
+                    </div>
+                    <div class="stat-card glass">
+                        <div class="stat-icon"><i class="fas fa-bed"></i></div>
+                        <div class="stat-number" id="statBeds">0</div>
+                        <div class="stat-label" data-en="ICU Beds Available" data-ta="கிடைக்கும் ICU படுக்கைகள்">ICU Beds Available</div>
+                    </div>
+                    <div class="stat-card glass">
+                        <div class="stat-icon"><i class="fas fa-ambulance"></i></div>
+                        <div class="stat-number" id="statResponse">0</div>
+                        <div class="stat-label" data-en="Avg Response Time" data-ta="சராசரி பதில் நேரம்">Avg Response Time</div>
+                    </div>
+                    <div class="stat-card glass">
+                        <div class="stat-icon"><i class="fas fa-heart"></i></div>
+                        <div class="stat-number" id="statSaved">0</div>
+                        <div class="stat-label" data-en="Lives Saved Today" data-ta="இன்று காப்பாற்றப்பட்ட உயிர்கள்">Lives Saved Today</div>
+                    </div>
+                </div>
+                
+                <div class="hero-cta">
+                    <a href="#live-flow" class="btn-primary">
+                        <i class="fas fa-play-circle"></i>
+                        <span data-en="View Live System" data-ta="நேரடி அமைப்பைக் காண்க">View Live System</span>
+                    </a>
+                    <a href="#ai-dashboard" class="btn-secondary">
+                        <i class="fas fa-chart-line"></i>
+                        <span data-en="AI Dashboard" data-ta="AI முகப்பு">AI Dashboard</span>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="hero-visual">
+                <div class="floating-cards">
+                    <div class="float-card card-1 glass">
+                        <i class="fas fa-brain"></i>
+                        <span>AI Processing</span>
+                    </div>
+                    <div class="float-card card-2 glass">
+                        <i class="fas fa-network-wired"></i>
+                        <span>Mesh Network</span>
+                    </div>
+                    <div class="float-card card-3 glass">
+                        <i class="fas fa-satellite-dish"></i>
+                        <span>Real-time Sync</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Problem & Solution Section -->
+        <section id="problem" class="problem-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-tag" data-en="The Challenge" data-ta="சவால்">The Challenge</span>
+                    <h2 class="section-title" data-en="Transforming Emergency Healthcare" data-ta="அவசர சுகாதாரத்தை மாற்றுதல்">Transforming Emergency Healthcare</h2>
+                </div>
+                
+                <div class="problem-grid">
+                    <div class="problem-card glass">
+                        <div class="problem-icon red">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <h3 data-en="Critical Time Loss" data-ta="மிக முக்கியமான நேர இழப்பு">Critical Time Loss</h3>
+                        <p data-en="Average 45 minutes wasted finding available ICU beds during emergencies, leading to preventable fatalities." data-ta="அவசரநிலையின் போது கிடைக்கக்கூடிய ICU படுக்கைகளைக் கண்டுபிடிக்க சராசரியாக 45 நிமிடங்கள் வீணாகின்றன, தடுக்கக்கூடிய இறப்புகளுக்கு வழிவகுக்கிறது.">Average 45 minutes wasted finding available ICU beds during emergencies, leading to preventable fatalities.</p>
+                    </div>
+                    
+                    <div class="problem-card glass">
+                        <div class="problem-icon orange">
+                            <i class="fas fa-random"></i>
+                        </div>
+                        <h3 data-en="Manual Coordination" data-ta="கைமுறை ஒருங்கிணைப்பு">Manual Coordination</h3>
+                        <p data-en="Phone-based bed allocation creates bottlenecks and errors during high-pressure emergency situations." data-ta="தொலைபேசி அடிப்படையிலான படுக்கை ஒதுக்கீடு அழுத்தமான அவசரநிலை சூழல்களில் தடைகள் மற்றும் பிழைகளை உருவாக்குகிறது.">Phone-based bed allocation creates bottlenecks and errors during high-pressure emergency situations.</p>
+                    </div>
+                    
+                    <div class="problem-card glass">
+                        <div class="problem-icon yellow">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <h3 data-en="No Predictive Capacity" data-ta="கணிப்புத் திறன் இல்லை">No Predictive Capacity</h3>
+                        <p data-en="Hospitals cannot anticipate demand spikes during disasters or mass casualty events." data-ta="அழிவுகள் அல்லது பெரும் உயிரிழப்பு நிகழ்வுகளின் போது மருத்துவமனைகள் தேவை அதிகரிப்பை எதிர்பார்க்க முடியாது.">Hospitals cannot anticipate demand spikes during disasters or mass casualty events.</p>
+                    </div>
+                </div>
+                
+                <div class="solution-divider">
+                    <div class="divider-line"></div>
+                    <div class="solution-badge glass">
+                        <i class="fas fa-lightbulb"></i>
+                        <span data-en="Our Solution" data-ta="எங்கள் தீர்வு">Our Solution</span>
+                    </div>
+                    <div class="divider-line"></div>
+                </div>
+                
+                <div class="solution-grid">
+                    <div class="solution-feature glass">
+                        <div class="feature-number">01</div>
+                        <div class="feature-content">
+                            <h4 data-en="Real-Time AI Routing" data-ta="நேரடி AI வழிநடத்தல்">Real-Time AI Routing</h4>
+                            <p data-en="Instant hospital matching based on proximity, availability, and specialization." data-ta="அருகாமை, கிடைக்கும் தன்மை மற்றும் நிபுணத்துவத்தின் அடிப்படையில் உடனடி மருத்துவமனை பொருத்தம்.">Instant hospital matching based on proximity, availability, and specialization.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="solution-feature glass">
+                        <div class="feature-number">02</div>
+                        <div class="feature-content">
+                            <h4 data-en="Predictive Analytics" data-ta="கணிப்பு பகுப்பாய்வு">Predictive Analytics</h4>
+                            <p data-en="ML models forecast ICU demand 6 hours ahead for proactive resource management." data-ta="ஆக்கப்பூர்வ வள மேலாண்மைக்காக 6 மணி நேரம் முன்னதாக ICU தேவையை ML மாதிரிகள் கணிக்கின்றன.">ML models forecast ICU demand 6 hours ahead for proactive resource management.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="solution-feature glass">
+                        <div class="feature-number">03</div>
+                        <div class="feature-content">
+                            <h4 data-en="Mesh Network Resilience" data-ta="Mesh பிணையம் வலிமை">Mesh Network Resilience</h4>
+                            <p data-en="Peer-to-peer hospital communication works even during internet outages." data-ta="இணைய பிழைகளின் போது கூட பியர்-டூ-பியர் மருத்துவமனை தகவல்தொடர்பு வேலை செய்கிறது.">Peer-to-peer hospital communication works even during internet outages.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="solution-feature glass">
+                        <div class="feature-number">04</div>
+                        <div class="feature-content">
+                            <h4 data-en="Automated SMS Alerts" data-ta="தானியங்கி SMS எச்சரிக்கைகள்">Automated SMS Alerts</h4>
+                            <p data-en="Instant notifications to doctors, nurses, and administrators with patient details." data-ta="நோயாளி விவரங்களுடன் மருத்துவர்கள், செவிலியர்கள் மற்றும் நிர்வாகிகளுக்கு உடனடி அறிவிப்புகள்.">Instant notifications to doctors, nurses, and administrators with patient details.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Live Emergency Flow Section -->
+        <section id="live-flow" class="live-flow-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-tag live-pulse">
+                        <span class="pulse-dot"></span>
+                        <span data-en="LIVE" data-ta="நேரடி">LIVE</span>
+                    </span>
+                    <h2 class="section-title" data-en="Emergency Flow Simulation" data-ta="அவசர ஓட்ட சிமுலேஷன்">Emergency Flow Simulation</h2>
+                </div>
+                
+                <div class="flow-container glass">
+                    <div class="flow-map" id="flowMap">
+                        <div class="map-bg"></div>
+                        <div class="location-marker start">
+                            <i class="fas fa-ambulance"></i>
+                            <span data-en="Accident Site" data-ta="விபத்து இடம்">Accident Site</span>
+                        </div>
+                        
+                        <div class="ambulance-track">
+                            <div class="ambulance-icon" id="ambulanceIcon">
+                                <i class="fas fa-ambulance"></i>
+                                <div class="ambulance-pulse"></div>
+                            </div>
+                            <svg class="route-line" viewBox="0 0 400 100" preserveAspectRatio="none">
+                                <path d="M 0 50 Q 100 20, 200 50 T 400 50" stroke="url(#routeGradient)" stroke-width="3" fill="none" stroke-dasharray="10,5"/>
+                                <defs>
+                                    <linearGradient id="routeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" style="stop-color:#0f766e;stop-opacity:1" />
+                                        <stop offset="100%" style="stop-color:#dc2626;stop-opacity:1" />
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        </div>
+                        
+                        <div class="location-marker end">
+                            <i class="fas fa-hospital"></i>
+                            <span id="targetHospital" data-en="Chennai GH" data-ta="சென்னை GH">Chennai GH</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flow-timeline">
+                        <div class="timeline-step active" id="step1">
+                            <div class="step-icon">
+                                <i class="fas fa-ambulance"></i>
+                            </div>
+                            <div class="step-content">
+                                <h4 data-en="Emergency Dispatch" data-ta="அவசர அனுப்புதல்">Emergency Dispatch</h4>
+                                <p data-en="Ambulance dispatched to location" data-ta="இடத்திற்கு ஆம்புலன்ஸ் அனுப்பப்பட்டது">Ambulance dispatched to location</p>
+                                <span class="step-time">14:32:05</span>
+                            </div>
+                            <div class="step-arrow"><i class="fas fa-chevron-right"></i></div>
+                        </div>
+                        
+                        <div class="timeline-step" id="step2">
+                            <div class="step-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <div class="step-content">
+                                <h4 data-en="AI Cloud Analysis" data-ta="AI கிளவுட் பகுப்பாய்வு">AI Cloud Analysis</h4>
+                                <p data-en="Processing patient vitals..." data-ta="நோயாளி உயிர்காக்கும் குறிகாட்டிகளை செயலாக்குகிறது...">Processing patient vitals...</p>
+                                <span class="step-time">--:--:--</span>
+                            </div>
+                            <div class="step-arrow"><i class="fas fa-chevron-right"></i></div>
+                        </div>
+                        
+                        <div class="timeline-step" id="step3">
+                            <div class="step-icon">
+                                <i class="fas fa-hospital"></i>
+                            </div>
+                            <div class="step-content">
+                                <h4 data-en="Hospital Alert" data-ta="மருத்துவமனை எச்சரிக்கை">Hospital Alert</h4>
+                                <p data-en="Notifying nearest available hospital" data-ta="அருகிலுள்ள கிடைக்கும் மருத்துவமனைக்கு அறிவித்தல்">Notifying nearest available hospital</p>
+                                <span class="step-time">--:--:--</span>
+                            </div>
+                            <div class="step-arrow"><i class="fas fa-chevron-right"></i></div>
+                        </div>
+                        
+                        <div class="timeline-step" id="step4">
+                            <div class="step-icon">
+                                <i class="fas fa-bed"></i>
+                            </div>
+                            <div class="step-content">
+                                <h4 data-en="Bed Reserved" data-ta="படுக்கை ஒதுக்கப்பட்டது">Bed Reserved</h4>
+                                <p data-en="ICU bed allocated and reserved" data-ta="ICU படுக்கை ஒதுக்கப்பட்டு காப்பாற்றப்பட்டது">ICU bed allocated and reserved</p>
+                                <span class="step-time">--:--:--</span>
+                            </div>
+                            <div class="step-arrow"><i class="fas fa-chevron-right"></i></div>
+                        </div>
+                        
+                        <div class="timeline-step" id="step5">
+                            <div class="step-icon">
+                                <i class="fas fa-sms"></i>
+                            </div>
+                            <div class="step-content">
+                                <h4 data-en="SMS Alert Sent" data-ta="SMS எச்சரிக்கை அனுப்பப்பட்டது">SMS Alert Sent</h4>
+                                <p data-en="Medical team notified" data-ta="மருத்துவ குழு அறிவிக்கப்பட்டது">Medical team notified</p>
+                                <span class="step-time">--:--:--</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flow-metrics">
+                        <div class="metric-card glass">
+                            <i class="fas fa-clock"></i>
+                            <div class="metric-value" id="etaTimer">12:45</div>
+                            <div class="metric-label" data-en="ETA to Hospital" data-ta="மருத்துவமனைக்கு நேரம்">ETA to Hospital</div>
+                        </div>
+                        <div class="metric-card glass">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <div class="metric-value" id="severityDisplay">--</div>
+                            <div class="metric-label" data-en="Severity Score" data-ta="தீவிரத்தை மதிப்பெண்">Severity Score</div>
+                        </div>
+                        <div class="metric-card glass">
+                            <i class="fas fa-route"></i>
+                            <div class="metric-value">8.5 km</div>
+                            <div class="metric-label" data-en="Distance" data-ta="தூரம்">Distance</div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn-primary restart-flow" onclick="restartFlowSimulation()">
+                        <i class="fas fa-redo"></i>
+                        <span data-en="Restart Simulation" data-ta="சிமுலேஷனை மீண்டும் தொடங்கு">Restart Simulation</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Severity Dashboard -->
+        <section id="ai-dashboard" class="ai-dashboard-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-tag">
+                        <i class="fas fa-brain"></i>
+                        <span data-en="AI Engine" data-ta="AI இயந்திரம்">AI Engine</span>
+                    </span>
+                    <h2 class="section-title" data-en="Real-Time Severity Assessment" data-ta="நேரடி தீவிரத்தை மதிப்பீடு">Real-Time Severity Assessment</h2>
+                </div>
+                
+                <div class="ai-dashboard-grid">
+                    <div class="severity-panel glass">
+                        <div class="panel-header">
+                            <h3 data-en="AI Risk Analysis" data-ta="AI இடையீட்டு பகுப்பாய்வு">AI Risk Analysis</h3>
+                            <div class="ai-status">
+                                <span class="status-dot active"></span>
+                                <span data-en="Processing" data-ta="செயலாக்கம்">Processing</span>
+                            </div>
+                        </div>
+                        
+                        <div class="risk-meter-container">
+                            <div class="risk-meter">
+                                <svg viewBox="0 0 200 120">
+                                    <defs>
+                                        <linearGradient id="meterGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                            <stop offset="0%" style="stop-color:#16a34a" />
+                                            <stop offset="50%" style="stop-color:#f59e0b" />
+                                            <stop offset="100%" style="stop-color:#dc2626" />
+                                        </linearGradient>
+                                    </defs>
+                                    <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="url(#meterGradient)" stroke-width="20" stroke-linecap="round"/>
+                                    <path id="meterFill" d="M 20 100 A 80 80 0 0 1 20 100" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="20" stroke-linecap="round"/>
+                                    <line id="meterNeedle" x1="100" y1="100" x2="100" y2="30" stroke="#1e293b" stroke-width="4" stroke-linecap="round"/>
+                                    <circle cx="100" cy="100" r="8" fill="#1e293b"/>
+                                </svg>
+                                <div class="meter-center">
+                                    <div class="meter-value" id="severityScore">0</div>
+                                    <div class="meter-label" data-en="Severity Score" data-ta="தீவிரத்தை மதிப்பெண்">Severity Score</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="severity-indicators">
+                            <div class="indicator" id="icuRiskIndicator">
+                                <div class="indicator-label" data-en="ICU Risk" data-ta="ICU இடையீடு">ICU Risk</div>
+                                <div class="indicator-bar">
+                                    <div class="indicator-fill" id="icuRiskBar"></div>
+                                </div>
+                                <div class="indicator-value" id="icuRiskValue">0%</div>
+                            </div>
+                            <div class="indicator" id="confidenceIndicator">
+                                <div class="indicator-label" data-en="AI Confidence" data-ta="AI நம்பிக்கை">AI Confidence</div>
+                                <div class="indicator-bar">
+                                    <div class="indicator-fill" id="confidenceBar"></div>
+                                </div>
+                                <div class="indicator-value" id="confidenceValue">0%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="recommendation-box" id="recommendationBox">
+                            <i class="fas fa-user-md"></i>
+                            <div class="recommendation-content">
+                                <h4 data-en="Recommended Ward" data-ta="பரிந்துரைக்கப்பட்ட வார்டு">Recommended Ward</h4>
+                                <p id="wardRecommendation" data-en="Analyzing..." data-ta="பகுப்பாய்வு செய்கிறது...">Analyzing...</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="vitals-panel glass">
+                        <div class="panel-header">
+                            <h3 data-en="Patient Vitals" data-ta="நோயாளி உயிர்காக்கும் குறிகாட்டிகள்">Patient Vitals</h3>
+                            <span class="live-badge">LIVE</span>
+                        </div>
+                        
+                        <div class="vitals-grid">
+                            <div class="vital-card" id="heartRateCard">
+                                <div class="vital-icon"><i class="fas fa-heartbeat"></i></div>
+                                <div class="vital-info">
+                                    <span class="vital-label" data-en="Heart Rate" data-ta="இதய துடிப்பு">Heart Rate</span>
+                                    <span class="vital-value" id="heartRate">--</span>
+                                    <span class="vital-unit">bpm</span>
+                                </div>
+                                <div class="vital-chart" id="heartChart"></div>
+                            </div>
+                            
+                            <div class="vital-card" id="bpCard">
+                                <div class="vital-icon"><i class="fas fa-stethoscope"></i></div>
+                                <div class="vital-info">
+                                    <span class="vital-label" data-en="Blood Pressure" data-ta="இரத்த அழுத்தம்">Blood Pressure</span>
+                                    <span class="vital-value" id="bloodPressure">--/--</span>
+                                    <span class="vital-unit">mmHg</span>
+                                </div>
+                            </div>
+                            
+                            <div class="vital-card" id="spo2Card">
+                                <div class="vital-icon"><i class="fas fa-lungs"></i></div>
+                                <div class="vital-info">
+                                    <span class="vital-label" data-en="SpO2" data-ta="SpO2">SpO2</span>
+                                    <span class="vital-value" id="spo2">--</span>
+                                    <span class="vital-unit">%</span>
+                                </div>
+                                <div class="vital-chart" id="spo2Chart"></div>
+                            </div>
+                            
+                            <div class="vital-card" id="tempCard">
+                                <div class="vital-icon"><i class="fas fa-thermometer-half"></i></div>
+                                <div class="vital-info">
+                                    <span class="vital-label" data-en="Temperature" data-ta="வெப்பநிலை">Temperature</span>
+                                    <span class="vital-value" id="temperature">--</span>
+                                    <span class="vital-unit">°C</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="ai-log">
+                            <h4 data-en="AI Decision Log" data-ta="AI முடிவு பதிவு">AI Decision Log</h4>
+                            <div class="log-container" id="aiLog">
+                                <div class="log-entry">
+                                    <span class="log-time">14:32:05</span>
+                                    <span class="log-text" data-en="System initialized" data-ta="அமைப்பு தொடங்கப்பட்டது">System initialized</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="ai-controls">
+                    <button class="btn-secondary" onclick="simulateRandomPatient()">
+                        <i class="fas fa-random"></i>
+                        <span data-en="Simulate New Patient" data-ta="புதிய நோயாளியை சிமுலேட் செய்க">Simulate New Patient</span>
+                    </button>
+                    <button class="btn-secondary" onclick="simulateCriticalPatient()">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span data-en="Simulate Critical Case" data-ta="மிக முக்கியமான வழக்கை சிமுலேட் செய்க">Simulate Critical Case</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tamil Nadu Hospital Map -->
+        <section id="hospital-map" class="hospital-map-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-tag">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <span data-en="Network Map" data-ta="பிணைய வரைபடம்">Network Map</span>
+                    </span>
+                    <h2 class="section-title" data-en="Tamil Nadu Hospital Network" data-ta="தமிழ்நாடு மருத்துவமனை பிணையம்">Tamil Nadu Hospital Network</h2>
+                </div>
+                
+                <div class="map-controls glass">
+                    <div class="control-group">
+                        <label data-en="Show Available Only" data-ta="கிடைக்கும் மட்டுமே காட்டு">Show Available Only</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="availableToggle" onchange="filterHospitals()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="control-group">
+                        <label data-en="ICU Type" data-ta="ICU வகை">ICU Type</label>
+                        <select id="icuTypeFilter" onchange="filterHospitals()">
+                            <option value="all" data-en="All Types" data-ta="எல்லா வகைகளும்">All Types</option>
+                            <option value="trauma" data-en="Trauma" data-ta="காயம்">Trauma</option>
+                            <option value="cardiac" data-en="Cardiac" data-ta="இதய">Cardiac</option>
+                            <option value="pediatric" data-en="Pediatric" data-ta="குழந்தை">Pediatric</option>
+                        </select>
+                    </div>
+                    <button class="btn-primary" onclick="locateNearestHospital()">
+                        <i class="fas fa-crosshairs"></i>
+                        <span data-en="Find Nearest" data-ta="அருகிலுள்ளதை கண்டுபிடி">Find Nearest</span>
+                    </button>
+                </div>
+                
+                <div class="map-container glass">
+                    <div id="tnMap" class="leaflet-map"></div>
+                    
+                    <div class="map-overlay">
+                        <div class="hospital-card glass" id="selectedHospitalCard">
+                            <div class="hospital-header">
+                                <h4 id="hospitalName">Select a Hospital</h4>
+                                <span class="hospital-status" id="hospitalStatus">--</span>
+                            </div>
+                            <div class="hospital-stats">
+                                <div class="h-stat">
+                                    <span class="h-label" data-en="Total ICU" data-ta="மொத்த ICU">Total ICU</span>
+                                    <span class="h-value" id="totalICU">--</span>
+                                </div>
+                                <div class="h-stat">
+                                    <span class="h-label" data-en="Available" data-ta="கிடைக்கும்">Available</span>
+                                    <span class="h-value available" id="availableICU">--</span>
+                                </div>
+                                <div class="h-stat">
+                                    <span class="h-label" data-en="Distance" data-ta="தூரம்">Distance</span>
+                                    <span class="h-value" id="hospitalDistance">--</span>
+                                </div>
+                                <div class="h-stat">
+                                    <span class="h-label" data-en="ETA" data-ta="வரும் நேரம்">ETA</span>
+                                    <span class="h-value" id="hospitalETA">--</span>
+                                </div>
+                            </div>
+                            <button class="btn-primary btn-small" onclick="reserveBedFromMap()" id="reserveBtn" disabled>
+                                <span data-en="Reserve Bed" data-ta="படுக்கை முன்பதிவு">Reserve Bed</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="hospital-legend glass">
+                    <div class="legend-item">
+                        <span class="legend-marker available"></span>
+                        <span data-en="ICU Available" data-ta="ICU கிடைக்கும்">ICU Available</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-marker limited"></span>
+                        <span data-en="Limited Beds" data-ta="குறைந்த படுக்கைகள்">Limited Beds</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-marker full"></span>
+                        <span data-en="ICU Full" data-ta="ICU நிரம்பியது">ICU Full</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-marker selected"></span>
+                        <span data-en="Selected" data-ta="தேர்ந்தெடுக்கப்பட்டது">Selected</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Smart Bed Dashboard -->
+        <section id="bed-dashboard" class="bed-dashboard-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-tag">
+                        <i class="fas fa-bed"></i>
+                        <span data-en="Bed Management" data-ta="படுக்கை மேலாண்மை">Bed Management</span>
+                    </span>
+                    <h2 class="section-title" data-en="Smart Bed Allocation Dashboard" data-ta="ஸ்மார்ட் படுக்கை ஒதுக்கீடு முகப்பு">Smart Bed Allocation Dashboard</h2>
+                </div>
+                
+                <div class="bed-overview glass">
+                    <div class="overview-item">
+                        <div class="overview-icon total"><i class="fas fa-bed"></i></div>
+                        <div class="overview-info">
+                            <span class="overview-value" id="totalBeds">0</span>
+                            <span class="overview-label" data-en="Total Beds" data-ta="மொத்த படுக்கைகள்">Total Beds</span>
+                        </div>
+                    </div>
+                    <div class="overview-item">
+                        <div class="overview-icon occupied"><i class="fas fa-user-injured"></i></div>
+                        <div class="overview-info">
+                            <span class="overview-value" id="occupiedBeds">0</span>
+                            <span class="overview-label" data-en="Occupied" data-ta="ஆக்கிரமிக்கப்பட்டது">Occupied</span>
+                        </div>
+                    </div>
+                    <div class="overview-item">
+                        <div class="overview-icon reserved"><i class="fas fa-clock"></i></div>
+                        <div class="overview-info">
+                            <span class="overview-value" id="reservedBeds">0</span>
+                            <span class="overview-label" data-en="Reserved" data-ta="முன்பதிவு செய்யப்பட்டது">Reserved</span>
+                        </div>
+                    </div>
+                    <div class="overview-item">
+                        <div class="overview-icon available"><i class="fas fa-check-circle"></i></div>
+                        <div class="overview-info">
+                            <span class="overview-value" id="availableBeds">0</span>
+                            <span class="overview-label" data-en="Available" data-ta="கிடைக்கும்">Available</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="ward-grid" id="wardGrid">
+                    <!-- Wards will be generated by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ICU Demand Prediction -->
+        <section id="prediction" class="prediction-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-tag">
+                        <i class="fas fa-chart-line"></i>
+                        <span data-en="Predictive Analytics" data-ta="கணிப்பு பகுப்பாய்வு">Predictive Analytics</span>
+                    </span>
+                    <h2 class="section-title" data-en="ICU Demand Forecasting" data-ta="ICU தேவை கணிப்பு">ICU Demand Forecasting</h2>
+                </div>
+                
+                <div class="prediction-warning" id="predictionWarning" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div class="warning-content">
+                        <h4 data-en="High Demand Alert" data-ta="உயர்ந்த தேவை எச்சரிக்கை">High Demand Alert</h4>
+                        <p data-en="Predicted ICU load exceeds 85% in next 3 hours. Consider activating disaster protocols." data-ta="அடுத்த 3 மணி நேரத்தில் கணிக்கப்பட்ட ICU சுமை 85% க்கு மேல். அழிவு நெறிமுறைகளை செயல்படுத்துவதை கருத்தில் கொள்ளவும்.">Predicted ICU load exceeds 85% in next 3 hours. Consider activating disaster protocols.</p>
+                    </div>
+                </div>
+                
+                <div class="prediction-grid">
+                    <div class="chart-container glass">
+                        <div class="chart-header">
+                            <h3 data-en="6-Hour Demand Forecast" data-ta="6-மணி நேர தேவை கணிப்பு">6-Hour Demand Forecast</h3>
+                            <div class="chart-legend">
+                                <span class="legend-dot actual"></span>
+                                <span data-en="Actual" data-ta="உண்மையான">Actual</span>
+                                <span class="legend-dot predicted"></span>
+                                <span data-en="Predicted" data-ta="கணிக்கப்பட்ட">Predicted</span>
+                            </div>
+                        </div>
+                        <canvas id="demandChart"></canvas>
+                    </div>
+                    
+                    <div class="prediction-insights glass">
+                        <h3 data-en="AI Insights" data-ta="AI நுண்ணறிவுகள்">AI Insights</h3>
+                        
+                        <div class="insight-card">
+                            <div class="insight-icon">
+                                <i class="fas fa-arrow-trend-up"></i>
+                            </div>
+                            <div class="insight-content">
+                                <h4 data-en="Peak Demand Expected" data-ta="உச்ச தேவை எதிர்பார்க்கப்படுகிறது">Peak Demand Expected</h4>
+                                <p id="peakTime" data-en="Today at 8:00 PM" data-ta="இன்று இரவு 8:00 மணி">Today at 8:00 PM</p>
+                                <span class="insight-value" id="peakLoad">87%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="insight-card">
+                            <div class="insight-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="insight-content">
+                                <h4 data-en="Recommended Staffing" data-ta="பரிந்துரைக்கப்பட்ட பணியாளர்கள்">Recommended Staffing</h4>
+                                <p data-en="Additional nurses needed" data-ta="கூடுதல் செவிலியர்கள் தேவை">Additional nurses needed</p>
+                                <span class="insight-value" id="staffNeeded">+5</span>
+                            </div>
+                        </div>
+                        
+                        <div class="insight-card">
+                            <div class="insight-icon">
+                                <i class="fas fa-hospital-user"></i>
+                            </div>
+                            <div class="insight-content">
+                                <h4 data-en="Transfer Recommendations" data-ta="மாற்ற பரிந்துரைகள்">Transfer Recommendations</h4>
+                                <p data-en="Stable patients to general wards" data-ta="நிலையான நோயாளிகள் பொது வார்டுகளுக்கு">Stable patients to general wards</p>
+                                <span class="insight-value" id="transferCount">3</span>
+                            </div>
+                        </div>
+                        
+                        <div class="prediction-accuracy">
+                            <span data-en="Model Accuracy" data-ta="மாதிரி துல்லியம்">Model Accuracy</span>
+                            <div class="accuracy-bar">
+                                <div class="accuracy-fill" style="width: 94%"></div>
+                            </div>
+                            <span class="accuracy-value">94.2%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SMS Alert Simulation -->
+        <section id="sms-alerts" class="sms-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-tag">
+                        <i class="fas fa-mobile-alt"></i>
+                        <span data-en="Alert System" data-ta="எச்சரிக்கை அமைப்பு">Alert System</span>
+                    </span>
+                    <h2 class="section-title" data-en="SMS Alert Simulation" data-ta="SMS எச்சரிக்கை சிமுலேஷன்">SMS Alert Simulation</h2>
+                </div>
+                
+                <div class="sms-container">
+                    <div class="phone-mockup glass">
+                        <div class="phone-header">
+                            <div class="phone-notch"></div>
+                            <div class="phone-status">
+                                <span>9:41</span>
+                                <div class="phone-icons">
+                                    <i class="fas fa-signal"></i>
+                                    <i class="fas fa-wifi"></i>
+                                    <i class="fas fa-battery-full"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="phone-screen">
+                            <div class="notification-list" id="notificationList">
+                                <div class="empty-state">
+                                    <i class="fas fa-bell-slash"></i>
+                                    <p data-en="No alerts yet" data-ta="இன்னும் எச்சரிக்கைகள் இல்லை">No alerts yet</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="phone-home-bar"></div>
+                    </div>
+                    
+                    <div class="alert-controls glass">
+                        <h3 data-en="Trigger Test Alerts" data-ta="சோதனை எச்சரிக்கைகளை தூண்டு">Trigger Test Alerts</h3>
+                        
+                        <div class="alert-buttons">
+                            <button class="alert-btn doctor" onclick="triggerAlert('doctor')">
+                                <i class="fas fa-user-md"></i>
+                                <span data-en="Doctor Alert" data-ta="மருத்துவர் எச்சரிக்கை">Doctor Alert</span>
+                            </button>
+                            <button class="alert-btn nurse" onclick="triggerAlert('nurse')">
+                                <i class="fas fa-user-nurse"></i>
+                                <span data-en="Nurse Alert" data-ta="செவிலியர் எச்சரிக்கை">Nurse Alert</span>
+                            </button>
+                            <button class="alert-btn admin" onclick="triggerAlert('admin')">
+                                <i class="fas fa-user-shield"></i>
+                                <span data-en="Admin Alert" data-ta="நிர்வாகி எச்சரிக்கை">Admin Alert</span>
+                            </button>
+                        </div>
+                        
+                        <div class="alert-settings">
+                            <h4 data-en="Alert Settings" data-ta="எச்சரிக்கை அமைப்புகள்">Alert Settings</h4>
+                            
+                            <div class="setting-item">
+                                <label data-en="Severity Threshold" data-ta="தீவிரத்தை வரம்பு">Severity Threshold</label>
+                                <input type="range" min="0" max="100" value="70" id="severityThreshold" onchange="updateThreshold()">
+                                <span id="thresholdValue">70</span>
+                            </div>
+                            
+                            <div class="setting-item">
+                                <label data-en="Auto-escalate Critical" data-ta="தானியங்கி முக்கியமான மேம்படுத்தல்">Auto-escalate Critical</label>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mesh Network Visualization -->
+        <section id="mesh-network" class="mesh-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-tag">
+                        <i class="fas fa-network-wired"></i>
+                        <span data-en="Mesh Network" data-ta="Mesh பிணையம்">Mesh Network</span>
+                    </span>
+                    <h2 class="section-title" data-en="Hospital Mesh Network" data-ta="மருத்துவமனை Mesh பிணையம்">Hospital Mesh Network</h2>
+                </div>
+                
+                <div class="mesh-controls glass">
+                    <button class="btn-secondary" onclick="simulateInternetFailure()">
+                        <i class="fas fa-wifi-slash"></i>
+                        <span data-en="Simulate Internet Failure" data-ta="இணைய பிழையை சிமுலேட் செய்க">Simulate Internet Failure</span>
+                    </button>
+                    <button class="btn-secondary" onclick="restoreInternet()">
+                        <i class="fas fa-wifi"></i>
+                        <span data-en="Restore Connection" data-ta="இணைப்பை மீட்டமை">Restore Connection</span>
+                    </button>
+                    <div class="network-status" id="networkStatus">
+                        <span class="status-dot online"></span>
+                        <span data-en="Internet Connected" data-ta="இணையம் இணைக்கப்பட்டது">Internet Connected</span>
+                    </div>
+                </div>
+                
+                <div class="mesh-visualization glass">
+                    <svg viewBox="0 0 800 400" class="mesh-svg">
+                        <!-- Connections -->
+                        <line class="mesh-line" x1="150" y1="200" x2="400" y2="100" id="line1"/>
+                        <line class="mesh-line" x1="150" y1="200" x2="400" y2="300" id="line2"/>
+                        <line class="mesh-line" x1="400" y1="100" x2="650" y2="200" id="line3"/>
+                        <line class="mesh-line" x1="400" y1="300" x2="650" y2="200" id="line4"/>
+                        <line class="mesh-line" x1="400" y1="100" x2="400" y2="300" id="line5"/>
+                        
+                        <!-- Data packets -->
+                        <circle class="data-packet" r="4" id="packet1">
+                            <animateMotion dur="2s" repeatCount="indefinite" path="M 150 200 L 400 100"/>
+                        </circle>
+                        <circle class="data-packet" r="4" id="packet2">
+                            <animateMotion dur="2.5s" repeatCount="indefinite" path="M 400 100 L 650 200"/>
+                        </circle>
+                        <circle class="data-packet" r="4" id="packet3">
+                            <animateMotion dur="3s" repeatCount="indefinite" path="M 400 300 L 150 200"/>
+                        </circle>
+                        
+                        <!-- Hospitals -->
+                        <g class="mesh-node" id="node1" transform="translate(150, 200)">
+                            <circle class="node-circle" r="30"/>
+                            <foreignObject x="-20" y="-20" width="40" height="40">
+                                <div class="node-icon">
+                                    <i class="fas fa-hospital"></i>
+                                </div>
+                            </foreignObject>
+                            <text y="45" text-anchor="middle" class="node-label">Chennai GH</text>
+                            <text y="60" text-anchor="middle" class="node-status">Online</text>
+                        </g>
+                        
+                        <g class="mesh-node" id="node2" transform="translate(400, 100)">
+                            <circle class="node-circle" r="30"/>
+                            <foreignObject x="-20" y="-20" width="40" height="40">
+                                <div class="node-icon">
+                                    <i class="fas fa-hospital"></i>
+                                </div>
+                            </foreignObject>
+                            <text y="45" text-anchor="middle" class="node-label">Madurai GH</text>
+                            <text y="60" text-anchor="middle" class="node-status">Online</text>
+                        </g>
+                        
+                        <g class="mesh-node" id="node3" transform="translate(650, 200)">
+                            <circle class="node-circle" r="30"/>
+                            <foreignObject x="-20" y="-20" width="40" height="40">
+                                <div class="node-icon">
+                                    <i class="fas fa-hospital"></i>
+                                </div>
+                            </foreignObject>
+                            <text y="45" text-anchor="middle" class="node-label">Coimbatore GH</text>
+                            <text y="60" text-anchor="middle" class="node-status">Online</text>
+                        </g>
+                        
+                        <g class="mesh-node" id="node4" transform="translate(400, 300)">
+                            <circle class="node-circle" r="30"/>
+                            <foreignObject x="-20" y="-20" width="40" height="40">
+                                <div class="node-icon">
+                                    <i class="fas fa-hospital"></i>
+                                </div>
+                            </foreignObject>
+                            <text y="45" text-anchor="middle" class="node-label">Trichy GH</text>
+                            <text y="60" text-anchor="middle" class="node-status">Online</text>
+                        </g>
+                    </svg>
+                    
+                    <div class="mesh-info">
+                        <div class="info-card glass">
+                            <h4 data-en="Network Features" data-ta="பிணைய அம்சங்கள்">Network Features</h4>
+                            <ul>
+                                <li><i class="fas fa-check"></i> <span data-en="Auto-routing on node failure" data-ta="கணு பிழையில் தானியங்கி வழிநடத்தல்">Auto-routing on node failure</span></li>
+                                <li><i class="fas fa-check"></i> <span data-en="Encrypted peer-to-peer sync" data-ta="குறியாக்கப்பட்ட பியர்-டூ-பியர் ஒத்திசைவு">Encrypted peer-to-peer sync</span></li>
+                                <li><i class="fas fa-check"></i> <span data-en="Sub-100ms latency" data-ta="100 மி.வி. க்கும் குறைவான தாமதம்">Sub-100ms latency</span></li>
+                                <li><i class="fas fa-check"></i> <span data-en="Offline-first architecture" data-ta="ஆஃப்லைன்-முதல் கட்டமைப்பு">Offline-first architecture</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="main-footer">
+            <div class="footer-container">
+                <div class="footer-grid">
+                    <div class="footer-brand">
+                        <div class="footer-logo">
+                            <i class="fas fa-heartbeat"></i>
+                            <span>SMART-ER 2.0</span>
+                        </div>
+                        <p data-en="AI-powered emergency healthcare system for Tamil Nadu. Saving lives through intelligent technology." data-ta="தமிழ்நாட்டிற்கான AI-ஆற்றல் அவசர சுகாதார அமைப்பு. புத்திசாலித்தனமான தொழில்நுட்பத்தின் மூலம் உயிர்களை காப்பாற்றுதல்.">AI-powered emergency healthcare system for Tamil Nadu. Saving lives through intelligent technology.</p>
+                        <div class="social-links">
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fab fa-linkedin"></i></a>
+                            <a href="#"><i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-links">
+                        <h4 data-en="Quick Links" data-ta="விரைவு இணைப்புகள்">Quick Links</h4>
+                        <ul>
+                            <li><a href="#hero" data-en="Home" data-ta="முகப்பு">Home</a></li>
+                            <li><a href="#ai-dashboard" data-en="Dashboard" data-ta="முகப்பு">Dashboard</a></li>
+                            <li><a href="#hospital-map" data-en="Hospital Map" data-ta="மருத்துவமனை வரைபடம்">Hospital Map</a></li>
+                            <li><a href="#bed-dashboard" data-en="Bed Status" data-ta="படுக்கை நிலை">Bed Status</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="footer-links">
+                        <h4 data-en="Resources" data-ta="வளங்கள்">Resources</h4>
+                        <ul>
+                            <li><a href="#" data-en="API Documentation" data-ta="API ஆவணங்கள்">API Documentation</a></li>
+                            <li><a href="#" data-en="User Guide" data-ta="பயனர் வழிகாட்டி">User Guide</a></li>
+                            <li><a href="#" data-en="Privacy Policy" data-ta="தனியுரிமை கொள்கை">Privacy Policy</a></li>
+                            <li><a href="#" data-en="Terms of Service" data-ta="சேவை விதிமுறைகள்">Terms of Service</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="footer-contact">
+                        <h4 data-en="Emergency Contact" data-ta="அவசர தொடர்பு">Emergency Contact</h4>
+                        <div class="contact-item">
+                            <i class="fas fa-phone-alt"></i>
+                            <span>108</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <span>emergency@smart-er.tn.gov.in</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span data-en="Directorate of Medical Services, Chennai" data-ta="மருத்துவ சேவைகள் இயக்ககம், சென்னை">Directorate of Medical Services, Chennai</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="footer-bottom">
+                    <p>&copy; 2024 Government of Tamil Nadu. <span data-en="All rights reserved." data-ta="அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.">All rights reserved.</span></p>
+                    <p class="made-with" data-en="Made with ❤️ for Tamil Nadu" data-ta="தமிழ்நாட்டிற்காக ❤️ உடன் உருவாக்கப்பட்டது">Made with ❤️ for Tamil Nadu</p>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <!-- Patient Modal -->
+    <div class="modal" id="patientModal">
+        <div class="modal-content glass">
+            <div class="modal-header">
+                <h3 data-en="Patient Details" data-ta="நோயாளி விவரங்கள்">Patient Details</h3>
+                <button class="modal-close" onclick="closePatientModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Content populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+</body>
+`
